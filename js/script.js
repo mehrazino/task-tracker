@@ -699,8 +699,8 @@ function updateProgress(goalId, incrementValue) {
         goals[goalIndex].current += incrementValue;
         goals[goalIndex].lastUpdated = new Date().toISOString();
         
-        // Update Telegram link if applicable
-        updateTelegramLink(goalIndex);
+        // Update Telegram link if applicable and get update status
+        const linkUpdated = updateTelegramLink(goalIndex);
         
         // Check if goal is newly completed
         const isNowCompleted = goals[goalIndex].current >= goals[goalIndex].target && goals[goalIndex].target > 0;
@@ -719,6 +719,12 @@ function updateProgress(goalId, incrementValue) {
         const inputField = document.getElementById(`increment-value-${goalId}`);
         if (inputField) {
             inputField.value = '';
+        }
+        
+        // Show notification if link was updated
+        if (linkUpdated) {
+            const goal = goals[goalIndex];
+            showNotification(`لینک تلگرام به‌روز شد: پست ${goal.current}`, 'info', 1500);
         }
     }
 }
@@ -740,18 +746,21 @@ function updateTelegramLink(goalIndex) {
                 const channelName = pathParts[0];
                 
                 // Create a new URL with the current progress as the post number
+                // Even if target is null (unknown), we still update the link with current progress
                 const newUrl = `https://t.me/${channelName}/${goal.current}`;
                 
                 // Update the link
                 if (goal.link !== newUrl) {
                     console.log(`Updating Telegram link for "${goal.name}" from ${goal.link} to ${newUrl}`);
                     goal.link = newUrl;
+                    return true; // Return true to indicate the link was updated
                 }
             }
         } catch (error) {
             console.error(`Error updating Telegram link for goal ${goal.id}:`, error);
         }
     }
+    return false; // Return false to indicate no update was made
 }
 
 // Update a specific goal element
@@ -770,6 +779,26 @@ function updateGoalElement(goalId) {
         // Update stats text
         const statsElement = existingElement.querySelector('.goal-stats');
         statsElement.textContent = `${goal.current} از ${hasTarget ? goal.target : '؟'} ${hasTarget ? `(${percentage}%)` : ''}`;
+        
+        // Update link if it exists
+        if (goal.link) {
+            const linkElement = existingElement.querySelector('.link-icon');
+            if (linkElement) {
+                linkElement.href = goal.link;
+            } else {
+                // If link element doesn't exist but goal has a link, recreate the title section
+                const titleElement = existingElement.querySelector('.goal-title');
+                if (titleElement) {
+                    titleElement.innerHTML = `
+                        <span class="goal-title-text">${goal.name}</span>
+                        <div class="goal-title-icons">
+                            <span class="info-icon" title="اطلاعات کارت" onclick="showGoalInfo(${goal.id}); event.stopPropagation();">ℹ️</span>
+                            <a href="${goal.link}" target="_blank" class="link-icon" onclick="event.stopPropagation();" title="باز کردن لینک">🔗</a>
+                        </div>
+                    `;
+                }
+            }
+        }
         
         // Check if we need to add or update progress bar
         let progressBarContainer = existingElement.querySelector('.progress-bar-container');
@@ -1110,6 +1139,9 @@ function editGoal(goalId) {
             goals[goalIndex].target = newTarget;
             goals[goalIndex].lastUpdated = new Date().toISOString();
             
+            // Update Telegram link if applicable
+            const linkUpdated = updateTelegramLink(goalIndex);
+            
             // Save to localStorage
             saveGoals();
             
@@ -1121,6 +1153,13 @@ function editGoal(goalId) {
             
             // Show success notification
             showNotification(`کار "${goals[goalIndex].name}" با موفقیت به‌روز شد!`, 'success');
+            
+            // Show additional notification if link was updated
+            if (linkUpdated) {
+                setTimeout(() => {
+                    showNotification(`لینک تلگرام به‌روز شد: پست ${goals[goalIndex].current}`, 'info', 1500);
+                }, 1000);
+            }
         }
     } else {
         showNotification('لطفاً تعداد کار را به درستی وارد کنید!', 'error');
