@@ -310,9 +310,9 @@ function showSupportModal() {
                     <p>اگه این پروژه برات مفید بوده، می‌تونی با یکی از روش‌های زیر<br>از توسعه‌دهنده حمایت کنی:</p>
                         <div class="support-option">
                             <ul>
-                                <li><a href="https://github.com/mehrazino/goal-tracker/issues/new" target="_blank">اگه پیشنهادی داری بهم بگی</a></li>
-                                <li><a href="https://github.com/mehrazino/goal-tracker" target="_blank">یه ⭐ به این پروژه در گیت‌هاب بدی</a></li>
-                                <li><a href="https://github.com/mehrazino/goal-tracker/fork" target="_blank">در توسعه کد مشارکت کنی</a></li>
+                                <li><a href="https://github.com/mehrazino/task-tracker/issues/new" target="_blank">اگه پیشنهادی داری بهم بگی</a></li>
+                                <li><a href="https://github.com/mehrazino/task-tracker" target="_blank">یه ⭐ به این پروژه در گیت‌هاب بدی</a></li>
+                                <li><a href="https://github.com/mehrazino/task-tracker/fork" target="_blank">در توسعه کد مشارکت کنی</a></li>
                             </ul>
                         </div>
                     <br>
