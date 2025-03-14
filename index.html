@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>کارهات</title>
+    <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <h1>کارهات</h1>
+    
+    <!-- Add form container that will hold both form and button -->
+    <div class="form-container">
+        <!-- Place form before button so it appears above -->
+        <form id="add-goal-form" class="add-goal-form" style="display: none; overflow: hidden; max-height: 0;">
+            <input type="text" id="goal_name" placeholder="نام برنامه جدید" required>
+            <input type="number" id="goal_target" placeholder="تعداد کار" required>
+            <input type="url" id="goal_link" placeholder="لینک (اختیاری)">
+            <button type="button" id="add-goal-submit">افزودن</button>
+        </form>
+        
+        <!-- Add toggle button for the form -->
+        <button id="toggle-add-form" class="toggle-form-button">افزودن کار جدید</button>
+    </div>
+    
+    <div id="goals">
+        <!-- Goals will be dynamically added here by JavaScript -->
+    </div>
+    
+    <!-- Link to JavaScript file -->
+    <script src="js/script.js"></script>
+</body>
+</html> 
