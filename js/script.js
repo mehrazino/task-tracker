@@ -721,11 +721,6 @@ function updateProgress(goalId, incrementValue) {
             inputField.value = '';
         }
         
-        // Show notification if link was updated
-        if (linkUpdated) {
-            const goal = goals[goalIndex];
-            showNotification(`لینک تلگرام به‌روز شد: پست ${goal.current}`, 'info', 1500);
-        }
     }
 }
 
@@ -1154,12 +1149,6 @@ function editGoal(goalId) {
             // Show success notification
             showNotification(`کار "${goals[goalIndex].name}" با موفقیت به‌روز شد!`, 'success');
             
-            // Show additional notification if link was updated
-            if (linkUpdated) {
-                setTimeout(() => {
-                    showNotification(`لینک تلگرام به‌روز شد: پست ${goals[goalIndex].current}`, 'info', 1500);
-                }, 1000);
-            }
         }
     } else {
         showNotification('لطفاً تعداد کار را به درستی وارد کنید!', 'error');
