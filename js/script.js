@@ -1012,7 +1012,7 @@ function addGoal() {
     const targetValue = targetInput.value.trim();
     const link = linkInput.value.trim();
     
-    // تعداد کار می‌تواند خالی باشد یا یک عدد مثبت
+    // The number of tasks can be empty or a positive number
     const target = targetValue === '' ? null : parseInt(targetValue);
     
     if (name && (target === null || (!isNaN(target) && target > 0))) {
@@ -1057,7 +1057,7 @@ function editGoal(goalId) {
     const newTargetInput = document.getElementById(`new-target-${goalId}`);
     const newTargetValue = newTargetInput.value.trim();
     
-    // تعداد کار می‌تواند خالی باشد یا یک عدد مثبت
+    // The number of tasks can be empty or a positive number
     const newTarget = newTargetValue === '' ? null : parseInt(newTargetValue);
     
     if (newTargetValue === '' || (!isNaN(newTarget) && newTarget >= 0)) {
