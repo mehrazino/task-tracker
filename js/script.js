@@ -463,6 +463,14 @@ function loadGoals() {
         if (goals.length > 0) {
             const maxId = Math.max(...goals.map(goal => goal.id));
             nextId = maxId + 1;
+            
+            // Update Telegram links for all goals
+            goals.forEach((goal, index) => {
+                updateTelegramLink(index);
+            });
+            
+            // Save updated goals with updated links
+            saveGoals();
         }
     }
 }
@@ -691,6 +699,9 @@ function updateProgress(goalId, incrementValue) {
         goals[goalIndex].current += incrementValue;
         goals[goalIndex].lastUpdated = new Date().toISOString();
         
+        // Update Telegram link if applicable
+        updateTelegramLink(goalIndex);
+        
         // Check if goal is newly completed
         const isNowCompleted = goals[goalIndex].current >= goals[goalIndex].target && goals[goalIndex].target > 0;
         if (isNowCompleted && !wasCompleted) {
@@ -708,6 +719,37 @@ function updateProgress(goalId, incrementValue) {
         const inputField = document.getElementById(`increment-value-${goalId}`);
         if (inputField) {
             inputField.value = '';
+        }
+    }
+}
+
+// Function to update Telegram link based on current progress
+function updateTelegramLink(goalIndex) {
+    const goal = goals[goalIndex];
+    
+    // Check if the goal has a link and if it's a Telegram link
+    if (goal.link && typeof goal.link === 'string' && goal.link.includes('t.me/')) {
+        try {
+            // Parse the URL
+            const url = new URL(goal.link);
+            const pathParts = url.pathname.split('/').filter(part => part);
+            
+            // Make sure we have at least a channel name
+            if (pathParts.length >= 1) {
+                // The channel name is the first part
+                const channelName = pathParts[0];
+                
+                // Create a new URL with the current progress as the post number
+                const newUrl = `https://t.me/${channelName}/${goal.current}`;
+                
+                // Update the link
+                if (goal.link !== newUrl) {
+                    console.log(`Updating Telegram link for "${goal.name}" from ${goal.link} to ${newUrl}`);
+                    goal.link = newUrl;
+                }
+            }
+        } catch (error) {
+            console.error(`Error updating Telegram link for goal ${goal.id}:`, error);
         }
     }
 }
