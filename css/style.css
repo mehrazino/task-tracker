@@ -680,6 +680,33 @@ a:hover {
     color: var(--primary-color);
 }
 
+/* Responsive adjustments for user badge */
+@media (max-width: 768px) {
+    .user-badge {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .user-badge .user-icon {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .user-badge {
+        top: 5px;
+        right: 5px;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    h1 {
+        margin-top: 40px; /* افزایش فاصله از بالا برای جلوگیری از تداخل با user-badge */
+    }
+}
+
 /* Footer styles */
 .app-footer {
     margin-top: 50px;
