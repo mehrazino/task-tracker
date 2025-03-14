@@ -519,9 +519,10 @@ function renderGoals() {
 
 // Create a goal element
 function createGoalElement(goal) {
-    // Calculate percentage
-    const percentage = goal.target > 0 ? (goal.current / goal.target * 100).toFixed(1) : 0;
-    const isCompleted = goal.current >= goal.target && goal.target > 0;
+    // Calculate percentage only if target is not null
+    const hasTarget = goal.target !== null;
+    const percentage = hasTarget && goal.target > 0 ? (goal.current / goal.target * 100).toFixed(1) : 0;
+    const isCompleted = hasTarget && goal.current >= goal.target && goal.target > 0;
     
     // Create goal element
     const goalElement = document.createElement('div');
@@ -554,14 +555,19 @@ function createGoalElement(goal) {
         </h3>
         
         <div class="goal-stats">
-            ${goal.current} از ${goal.target} 
-            (${percentage}%)
+            ${goal.current} از ${hasTarget ? goal.target : '؟'} 
+            ${hasTarget ? `(${percentage}%)` : ''}
         </div>
-        
+    `;
+    
+    // Add progress bar only if target is not null
+    if (hasTarget) {
+        goalHTML += `
         <div class="progress-bar-container">
             <div class="progress-bar" style="width: ${percentage}%;"></div>
         </div>
-    `;
+        `;
+    }
     
     // Add completed badge if goal is completed
     if (isCompleted) {
@@ -715,34 +721,85 @@ function updateGoalElement(goalId) {
     const existingElement = document.querySelector(`.goal[data-goal-id="${goalId}"]`);
     
     if (existingElement) {
-        // Instead of replacing the entire element, just update the parts that changed
-        const percentage = goal.target > 0 ? (goal.current / goal.target * 100).toFixed(1) : 0;
+        // Check if target was null before and now has a value
+        const hasTarget = goal.target !== null;
+        const percentage = hasTarget && goal.target > 0 ? (goal.current / goal.target * 100).toFixed(1) : 0;
         
         // Update stats text
         const statsElement = existingElement.querySelector('.goal-stats');
-        statsElement.textContent = `${goal.current} از ${goal.target} (${percentage}%)`;
+        statsElement.textContent = `${goal.current} از ${hasTarget ? goal.target : '؟'} ${hasTarget ? `(${percentage}%)` : ''}`;
         
-        // Update progress bar with smooth animation
-        const progressBar = existingElement.querySelector('.progress-bar');
+        // Check if we need to add or update progress bar
+        let progressBarContainer = existingElement.querySelector('.progress-bar-container');
         
-        // Make sure the transition is applied
-        progressBar.style.transition = 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        
-        // Add the updating class for wave animation
-        progressBar.classList.add('updating');
-        
-        // Update width with delay to ensure animation is visible
-        setTimeout(() => {
-            progressBar.style.width = `${percentage}%`;
-        }, 50);
-        
-        // Remove the updating class after animation completes
-        setTimeout(() => {
-            progressBar.classList.remove('updating');
-        }, 650);
+        if (hasTarget) {
+            if (!progressBarContainer) {
+                // Target was added, create progress bar container and bar
+                progressBarContainer = document.createElement('div');
+                progressBarContainer.className = 'progress-bar-container';
+                
+                const progressBar = document.createElement('div');
+                progressBar.className = 'progress-bar';
+                progressBar.style.width = '0%'; // Start at 0 for animation
+                
+                progressBarContainer.appendChild(progressBar);
+                
+                // Insert after stats
+                const statsElement = existingElement.querySelector('.goal-stats');
+                statsElement.insertAdjacentElement('afterend', progressBarContainer);
+                
+                // Force reflow to ensure animation works
+                void progressBarContainer.offsetWidth;
+                
+                // Set transition for smooth animation
+                progressBar.style.transition = 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                
+                // Add the updating class for wave animation
+                progressBar.classList.add('updating');
+                
+                // Update width with delay to ensure animation is visible
+                setTimeout(() => {
+                    progressBar.style.width = `${percentage}%`;
+                }, 50);
+                
+                // Remove the updating class after animation completes
+                setTimeout(() => {
+                    progressBar.classList.remove('updating');
+                }, 1050);
+            } else {
+                // Progress bar exists, just update it
+                const progressBar = progressBarContainer.querySelector('.progress-bar');
+                
+                // Make sure the transition is applied
+                progressBar.style.transition = 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                
+                // Add the updating class for wave animation
+                progressBar.classList.add('updating');
+                
+                // Update width with delay to ensure animation is visible
+                setTimeout(() => {
+                    progressBar.style.width = `${percentage}%`;
+                }, 50);
+                
+                // Remove the updating class after animation completes
+                setTimeout(() => {
+                    progressBar.classList.remove('updating');
+                }, 1050);
+            }
+        } else if (progressBarContainer) {
+            // Target was removed, remove progress bar with animation
+            progressBarContainer.style.transition = 'opacity 0.5s ease';
+            progressBarContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (progressBarContainer.parentNode) {
+                    progressBarContainer.parentNode.removeChild(progressBarContainer);
+                }
+            }, 500);
+        }
         
         // Check if completion status changed
-        const isCompleted = goal.current >= goal.target && goal.target > 0;
+        const isCompleted = hasTarget && goal.current >= goal.target && goal.target > 0;
         const hasCompletedBadge = existingElement.querySelector('.completed-badge');
         
         if (isCompleted && !hasCompletedBadge) {
@@ -952,10 +1009,13 @@ function addGoal() {
     const linkInput = document.getElementById('goal_link');
     
     const name = nameInput.value.trim();
-    const target = parseInt(targetInput.value);
+    const targetValue = targetInput.value.trim();
     const link = linkInput.value.trim();
     
-    if (name && !isNaN(target) && target > 0) {
+    // تعداد کار می‌تواند خالی باشد یا یک عدد مثبت
+    const target = targetValue === '' ? null : parseInt(targetValue);
+    
+    if (name && (target === null || (!isNaN(target) && target > 0))) {
         // Create new goal
         const newGoal = {
             id: nextId++,
@@ -988,16 +1048,19 @@ function addGoal() {
         // Show success notification
         showNotification(`کار "${name}" با موفقیت اضافه شد!`, 'success');
     } else {
-        showNotification('لطفاً نام و تعداد کار رو درست وارد کن!', 'error');
+        showNotification('لطفاً نام کار را به درستی وارد کنید!', 'error');
     }
 }
 
 // Function to edit a goal
 function editGoal(goalId) {
     const newTargetInput = document.getElementById(`new-target-${goalId}`);
-    const newTarget = parseInt(newTargetInput.value);
+    const newTargetValue = newTargetInput.value.trim();
     
-    if (!isNaN(newTarget) && newTarget >= 0) {
+    // تعداد کار می‌تواند خالی باشد یا یک عدد مثبت
+    const newTarget = newTargetValue === '' ? null : parseInt(newTargetValue);
+    
+    if (newTargetValue === '' || (!isNaN(newTarget) && newTarget >= 0)) {
         // Find the goal
         const goalIndex = goals.findIndex(goal => goal.id === goalId);
         if (goalIndex !== -1) {
@@ -1018,7 +1081,7 @@ function editGoal(goalId) {
             showNotification(`کار "${goals[goalIndex].name}" با موفقیت به‌روز شد!`, 'success');
         }
     } else {
-        showNotification('لطفاً تعداد کار رو درست وارد کن!', 'error');
+        showNotification('لطفاً تعداد کار را به درستی وارد کنید!', 'error');
     }
 }
 
