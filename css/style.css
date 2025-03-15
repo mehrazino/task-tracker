@@ -296,11 +296,10 @@ a:hover {
     padding: 12px 25px;
     font-size: 1.1rem;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 3px 10px rgba(62, 187, 85, 0.3);
     position: relative;
     z-index: 2;
-    margin-top: -5px; /* Slightly overlap with the form */
 }
 
 .toggle-form-button:hover {
@@ -323,27 +322,29 @@ a:hover {
     padding: 0;
     border-radius: 8px;
     box-shadow: var(--card-shadow);
-    max-width: 800px;
-    margin: -20px auto 30px; /* منفی برای ظاهر شدن از بالا */
+    max-width: 850px;
+    margin: 0 auto 30px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
     transform-origin: top center;
-    transform: scaleY(0);
-    height: 0;
-    font-size: 1.2rem; /* افزایش اندازه فونت */
+    max-height: 0;
+    opacity: 0;
+    will-change: transform, opacity, max-height;
+    border: 1px solid transparent;
 }
 
 .add-goal-form.visible {
     padding: 20px;
-    transform: scaleY(1);
-    height: auto;
+    max-height: 300px;
     margin-top: 0;
     margin-bottom: 30px;
+    opacity: 1;
+    border: 1px solid var(--card-border);
 }
 
 /* Adjust input fields in the form to match the new font size */
@@ -353,16 +354,363 @@ a:hover {
 .add-goal-form button {
     font-size: 1.2rem;
     padding: 12px 18px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 /* Add styles for the form container */
 .form-container {
     position: relative;
-    max-width: 800px;
+    max-width: 850px;
     margin: 0 auto 30px;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Styles for form input and button containers */
+.form-input-container, .form-button-container {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Desktop styles for form */
+@media (min-width: 577px) {
+    .add-goal-form {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 15px;
+        padding: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .add-goal-form.visible {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        padding: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .form-input-container {
+        flex: 1;
+        margin: 0 5px;
+        max-width: 250px;
+    }
+    
+    .form-button-container {
+        margin: 0 5px;
+        min-width: 120px;
+        max-width: 150px;
+    }
+    
+    .add-goal-form input[type="text"], 
+    .add-goal-form input[type="number"], 
+    .add-goal-form input[type="url"] {
+        width: 100%;
+    }
+    
+    .add-goal-form button[type="submit"] {
+        width: 100%;
+        white-space: nowrap;
+    }
+}
+
+/* Styles for portrait orientation (mobile phones) */
+@media (max-width: 576px) and (orientation: portrait) {
+    .goal {
+        width: 100% !important; /* Force single column with !important */
+        margin: 10px 0;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+    
+    #goals {
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    /* Improve button group layout for portrait mode */
+    .goal .button-group {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+        width: 100%;
+        align-items: center;
+    }
+    
+    /* Adjust button widths for portrait mode */
+    .goal .edit-button,
+    .goal .del-button,
+    .goal form .del-button {
+        width: 120px;
+        min-width: 120px;
+        padding: 8px 15px;
+        flex: 1;
+        max-width: 140px;
+    }
+    
+    /* Ensure edit form is fully visible in portrait mode */
+    .goal [id^="input-container-"] {
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        border-top: none !important;
+    }
+    
+    .goal [id^="input-container-"] input[type="number"] {
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
+        height: 40px;
+        box-sizing: border-box;
+        margin-bottom: 0;
+    }
+    
+    .goal [id^="input-container-"] button {
+        height: 40px;
+        min-width: 80px;
+        box-sizing: border-box;
+        margin-top: 0;
+    }
+    
+    /* Improve form animation for small screens in portrait mode */
+    .add-goal-form {
+        padding: 0;
+        gap: 8px;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-height: 0;
+    }
+    
+    .add-goal-form.visible {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        max-height: 400px;
+    }
+    
+    .add-goal-form input[type="text"], 
+    .add-goal-form input[type="number"], 
+    .add-goal-form input[type="url"],
+    .add-goal-form button {
+        font-size: 1rem;
+        padding: 10px 15px;
+        width: 100%;
+        box-sizing: border-box;
+        display: block;
+    }
+    
+    /* Reorganize form buttons for mobile */
+    .add-goal-form button[type="submit"] {
+        order: 10; /* Ensure it appears at the bottom */
+        margin-top: 10px;
+        width: 100%;
+        background-color: var(--primary-color);
+        color: white;
+        display: block;
+    }
+    
+    /* Ensure form containers are properly styled in portrait mode */
+    .form-input-container {
+        width: 100%;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+    }
+    
+    .form-button-container {
+        width: 100%;
+        margin-bottom: 0;
+        box-sizing: border-box;
+    }
+    
+    /* Fix for goal controls in mobile */
+    .goal-controls {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .goal .input-group {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+    
+    .goal input[type="number"] {
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
+        height: 40px;
+        box-sizing: border-box;
+    }
+    
+    .goal button {
+        height: 40px;
+        min-width: 80px;
+        box-sizing: border-box;
+    }
+}
+
+/* Make inputs and buttons full width on very small screens in portrait mode */
+@media (max-width: 400px) and (orientation: portrait) {
+    #goals {
+        gap: 12px;
+    }
+    
+    .goal {
+        padding: 12px;
+        margin: 8px 0;
+        width: 100% !important; /* Force single column with !important */
+    }
+    
+    .goal-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+    }
+    
+    .goal-stats {
+        font-size: 1rem;
+        margin: 8px 0;
+    }
+    
+    /* Adjust button layout for very small screens */
+    .goal .button-group {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .goal .edit-button,
+    .goal .del-button,
+    .goal form .del-button {
+        width: 100px;
+        min-width: 100px;
+        max-width: 120px;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+        flex: 1;
+    }
+    
+    /* Further improve edit form for very small screens */
+    .goal [id^="input-container-"] {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        border-top: none !important;
+    }
+    
+    .goal [id^="input-container-"] input[type="number"] {
+        width: 100%;
+        max-width: 100%;
+        font-size: 0.9rem;
+        height: 38px;
+    }
+    
+    .goal [id^="input-container-"] button {
+        width: 100%;
+        font-size: 0.9rem;
+        height: 38px;
+    }
+    
+    .goal input[type="number"],
+    .goal button:not(.edit-button):not(.del-button) {
+        width: 100%;
+        font-size: 0.9rem;
+        padding: 8px 10px;
+        height: 38px;
+    }
+    
+    .goal .input-group {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .goal .input-group input[type="number"] {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    /* Further improve form animation for very small screens in portrait mode */
+    .add-goal-form {
+        padding: 0;
+        gap: 6px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-height: 0;
+    }
+    
+    .add-goal-form.visible {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        max-height: 400px;
+    }
+    
+    .add-goal-form input[type="text"], 
+    .add-goal-form input[type="number"], 
+    .add-goal-form input[type="url"],
+    .add-goal-form button {
+        font-size: 0.95rem;
+        padding: 8px 12px;
+        margin-bottom: 0;
+        width: 100%;
+        box-sizing: border-box;
+        display: block;
+    }
+    
+    /* Ensure buttons are clearly visible and properly spaced */
+    .add-goal-form button[type="submit"] {
+        background-color: var(--primary-color);
+        color: white;
+        margin-top: 10px;
+        margin-bottom: 0;
+        order: 10; /* Ensure it appears at the bottom */
+        font-weight: bold;
+        font-size: 1.1rem;
+        padding: 10px 15px;
+        width: 100%;
+        display: block;
+        box-sizing: border-box;
+    }
+    
+    /* Ensure form containers are properly styled */
+    .form-input-container {
+        width: 100%;
+        margin-bottom: 8px;
+        box-sizing: border-box;
+    }
+    
+    .form-button-container {
+        width: 100%;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Fix for goal controls in very small screens */
+    .goal-controls {
+        max-height: 500px; /* Increase max-height for small screens */
+    }
 }
 
 /* Standardize input and button sizes in goal cards */
@@ -411,6 +759,12 @@ a:hover {
 .goal #input-container-visible,
 .goal [id^="input-container-"] {
     width: 100%;
+    transition: opacity 0.4s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 .goal [id^="input-container-"] form {
@@ -457,19 +811,39 @@ a:hover {
 }
 
 /* Responsive Design */
-@media (max-width: 992px) {
+@media (max-width: 992px) and (min-width: 577px) {
     .goal {
         width: calc(50% - 20px);
     }
     
-    .add-goal-form {
-        flex-direction: column;
-        align-items: stretch;
+    .form-input-container {
+        max-width: 200px;
+    }
+    
+    .add-goal-form input[type="text"], 
+    .add-goal-form input[type="number"], 
+    .add-goal-form input[type="url"] {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .add-goal-form button[type="submit"] {
+        width: 100%;
+        margin-top: 0;
     }
 }
 
-/* Update responsive design for consistent button and input sizing */
+/* Ensure single column layout for all mobile devices and small screens */
 @media (max-width: 768px) {
+    .goal {
+        width: 100%;
+        margin: 10px 0;
+    }
+    
+    #goals {
+        gap: 15px;
+    }
+    
     /* Adjust the width for medium screens */
     .goal input[type="number"],
     .goal button,
@@ -478,33 +852,6 @@ a:hover {
     .goal [id^="input-container-"] button {
         width: 110px;
         font-size: 0.85rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .goal {
-        width: 100%;
-    }
-    
-    /* Allow button groups to wrap on small screens */
-    .goal .button-group {
-        flex-wrap: wrap;
-    }
-}
-
-/* Make inputs and buttons full width on very small screens */
-@media (max-width: 400px) {
-    .goal input[type="number"],
-    .goal button,
-    .goal .edit-button,
-    .goal form .del-button,
-    .goal [id^="input-container-"] button {
-        width: 100%;
-    }
-    
-    .goal .input-group,
-    .goal .button-group {
-        flex-direction: column;
     }
 }
 
@@ -531,6 +878,8 @@ a:hover {
     border-radius: 8px;
     border: 1px dashed var(--danger-color);
     animation: fadeIn 0.3s ease-in-out;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .confirmation-message {
@@ -538,12 +887,22 @@ a:hover {
     font-weight: bold;
     color: var(--danger-hover);
     font-size: 0.95rem;
+    text-align: center;
 }
 
 .confirmation-buttons {
     display: flex;
     gap: 15px;
     justify-content: center;
+    width: 100%;
+}
+
+.confirm-delete-button, .cancel-delete-button {
+    flex: 1;
+    max-width: 140px;
+    min-width: 120px;
+    height: 40px;
+    box-sizing: border-box;
 }
 
 .confirm-delete-button {
@@ -564,6 +923,38 @@ a:hover {
 .cancel-delete-button:hover {
     background-color: #666;
     transform: translateY(-2px);
+}
+
+/* Portrait mode adjustments for delete confirmation */
+@media (max-width: 576px) and (orientation: portrait) {
+    .confirmation-buttons {
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .confirm-delete-button, .cancel-delete-button {
+        width: 120px;
+        min-width: 120px;
+        max-width: 140px;
+        padding: 8px 15px;
+        flex: 1;
+        font-size: 0.9rem;
+    }
+}
+
+/* Very small screens in portrait mode */
+@media (max-width: 400px) and (orientation: portrait) {
+    .confirmation-buttons {
+        gap: 10px;
+    }
+    
+    .confirm-delete-button, .cancel-delete-button {
+        width: 100px;
+        min-width: 100px;
+        max-width: 120px;
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
 }
 
 @keyframes fadeIn {
@@ -902,7 +1293,7 @@ a:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -927,6 +1318,11 @@ a:hover {
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
     direction: rtl;
+    max-height: 90vh; /* محدود کردن ارتفاع کلی مودال */
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+    border: 3px solid var(--primary-color); /* اضافه کردن حاشیه سبز رنگ به همه مودال‌ها */
 }
 
 .modal-overlay.visible .modal-content {
@@ -940,6 +1336,7 @@ a:hover {
     border-bottom: 1px solid var(--card-border);
     position: relative;
     justify-content: center;
+    flex-shrink: 0; /* جلوگیری از کوچک شدن هدر */
 }
 
 .modal-icon {
@@ -985,27 +1382,39 @@ a:hover {
 
 .modal-body {
     padding: 20px;
-    max-height: 80vh; /* Increased from 60vh to 80vh to provide more space */
     overflow-y: auto;
-}
-
-/* Special case for sync modal */
-.modal-content.info .modal-body {
-    overflow-y: visible;
-    max-height: none;
+    max-height: 60vh; /* محدود کردن ارتفاع برای اسکرول */
+    flex-grow: 1; /* اجازه رشد به بدنه مودال */
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .modal-body p {
     margin: 0 0 15px;
     line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Special case for info modal */
+.modal-content.info .modal-body {
+    text-align: center;
+    padding: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .modal-footer {
     padding: 15px 20px;
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
     border-top: 1px solid var(--card-border);
+    flex-shrink: 0; /* جلوگیری از کوچک شدن فوتر */
+    gap: 10px; /* افزودن فاصله بین دکمه‌ها */
 }
 
 .modal-button {
@@ -1014,6 +1423,9 @@ a:hover {
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.3s;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .modal-button.confirm-button {
@@ -1035,6 +1447,70 @@ a:hover {
 .modal-button.cancel-button:hover {
     background-color: #454545;
     transform: translateY(-2px);
+}
+
+/* Contact button in support modal */
+.modal-button.contact-button {
+    background-color: #3498db;
+    color: white;
+    flex: 1;
+    max-width: 160px; /* Match the max-width of the confirm button */
+    order: -1; /* Move to the right in RTL layout */
+    text-decoration: none;
+    text-align: center;
+    display: inline-block;
+}
+
+.modal-button.contact-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* Special case for support modal footer */
+.modal-content.support .modal-footer {
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+}
+
+.modal-content.support .modal-button {
+    min-width: 120px;
+    flex: 1;
+    max-width: 160px;
+    width: 100%; /* Ensure both buttons have the same width */
+    box-sizing: border-box;
+}
+
+/* Responsive adjustments for modal buttons */
+@media (max-width: 576px) {
+    .modal-content.support .modal-footer {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 10px;
+        justify-content: space-between;
+    }
+    
+    .modal-content.support .modal-button {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+        min-width: 100px;
+        max-width: 140px;
+        width: 100%;
+    }
+}
+
+@media (max-width: 400px) {
+    .modal-content.support .modal-footer {
+        gap: 8px;
+    }
+    
+    .modal-content.support .modal-button {
+        font-size: 0.85rem;
+        padding: 8px;
+        min-width: 90px;
+        max-width: 120px;
+        width: 100%;
+    }
 }
 
 /* Modal types */
@@ -1122,6 +1598,16 @@ a:hover {
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments for clear data button */
+@media (max-width: 576px) {
+    .user-info-content .clear-data-button {
+        max-width: 200px;
+        width: 100%;
+        padding: 8px 15px;
+        font-size: 0.95rem;
+    }
 }
 
 /* Notification styles */
@@ -1426,71 +1912,18 @@ a:hover {
     padding: 15px;
     border: 1px solid rgba(62, 187, 85, 0.2);
     text-align: center;
-}
-
-.export-data-container, .import-data-container {
-    margin: 15px auto;
-    width: 90%;
-    max-width: 400px;
-}
-
-.export-data-textarea, .import-data-textarea {
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
     width: 100%;
-    height: 120px;
-    padding: 10px;
-    border: 1px solid var(--card-border);
-    border-radius: 6px;
-    font-family: monospace;
-    direction: rtl;
-    resize: none;
-    background-color: #f8f9fa;
-    text-align: left;
-    margin: 0 auto;
-    display: block;
     box-sizing: border-box;
 }
 
-/* استایل‌های placeholder برای textarea */
-.import-data-textarea::placeholder {
-    font-family: 'Vazirmatn', sans-serif;
-    color: #888;
-    opacity: 0.8;
-    font-size: 0.95rem;
-    text-align: center;
-    padding-top: 40px;
-}
-
-.export-data-textarea:focus, .import-data-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(62, 187, 85, 0.2);
-}
-
-.export-data-actions {
-    display: flex;
-    justify-content: center;
-    margin: 15px 0;
-}
-
-.copy-export-button {
-    background-color: #face2fc5;
-    color: #000000c7;
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-    margin: 0 auto;
-    display: block;
-}
-
-.copy-export-button:hover {
-    background-color: rgb(255, 200, 0);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px #0000001a;
-}
-
-.copy-export-button.copied {
-    background-color: #27ae60;
+.export-data-container, .import-data-container {
+    margin: 10px auto;
+    width: 90%;
+    max-width: 400px;
+    box-sizing: border-box;
 }
 
 .export-data-instructions, .import-data-warning {
@@ -1502,6 +1935,10 @@ a:hover {
     width: 90%;
     max-width: 400px;
     text-align: right;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
 }
 
 .export-data-instructions p {
@@ -1539,10 +1976,18 @@ a:hover {
 /* Modal content for import/export */
 .modal-content.info .modal-body {
     text-align: center;
+    padding: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .modal-content.info .modal-body p {
     text-align: right;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Responsive adjustments for data transfer */
@@ -1558,11 +2003,243 @@ a:hover {
     }
     
     .export-data-textarea, .import-data-textarea {
-        height: 150px;
+        height: 100px; /* کاهش ارتفاع در صفحات کوچک */
     }
     
     .export-data-container, .import-data-container,
     .export-data-instructions, .import-data-warning {
         width: 95%;
+    }
+    
+    .export-data-instructions ol {
+        padding-right: 20px;
+        margin: 10px 0;
+    }
+    
+    .export-data-instructions li {
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+    }
+    
+    .export-data-content, .import-data-content {
+        padding: 10px;
+    }
+    
+    .export-data-content p, .import-data-content p {
+        margin: 5px 0;
+        font-size: 0.9rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .import-data-warning p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra small devices - specifically for 360x637 */
+@media (max-width: 400px) {
+    .modal-content {
+        width: 98%;
+        margin: 0 auto;
+        max-height: 85vh; /* افزایش کمی ارتفاع کلی مودال */
+    }
+    
+    .modal-body {
+        padding: 8px;
+        max-height: 55vh; /* کاهش بیشتر ارتفاع برای جلوگیری از اسکرول */
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+    }
+    
+    .modal-header {
+        padding: 8px 10px;
+    }
+    
+    .modal-header h3 {
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    
+    .modal-icon {
+        font-size: 1.1rem;
+        right: 8px;
+    }
+    
+    .modal-close {
+        font-size: 1.1rem;
+        left: 8px;
+    }
+    
+    .export-data-textarea, .import-data-textarea {
+        height: 60px; /* کاهش بیشتر ارتفاع تکست‌اریا */
+        font-size: 0.75rem;
+        padding: 6px;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+    
+    /* کاهش padding-top برای placeholder */
+    .import-data-textarea::placeholder {
+        padding-top: 15px;
+        font-size: 0.85rem;
+    }
+    
+    .export-data-instructions, .import-data-warning {
+        padding: 6px 10px;
+        margin: 8px auto;
+        width: 95%;
+        box-sizing: border-box;
+    }
+    
+    .export-data-instructions ol {
+        padding-right: 15px;
+        margin: 5px 0;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    
+    .export-data-instructions li {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+        line-height: 1.3;
+    }
+    
+    .export-data-instructions p {
+        margin-bottom: 5px;
+        font-size: 0.8rem;
+    }
+    
+    .import-data-warning p {
+        font-size: 0.75rem;
+    }
+    
+    .modal-footer {
+        padding: 8px;
+    }
+    
+    .modal-button {
+        padding: 5px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .export-data-content, .import-data-content {
+        padding: 6px;
+    }
+    
+    .export-data-actions {
+        margin: 6px 0;
+    }
+    
+    .copy-export-button {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .data-transfer-section h4 {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+    
+    .data-transfer-section p {
+        font-size: 0.75rem;
+        margin: 4px 0;
+    }
+    
+    /* کاهش فاصله بین دکمه‌ها در فوتر */
+    .modal-footer {
+        gap: 5px;
+    }
+}
+
+/* Add styles for export and import textareas */
+.export-data-textarea, .import-data-textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    font-family: monospace;
+    direction: rtl;
+    resize: none;
+    background-color: #f8f9fa;
+    text-align: left;
+    margin: 0 auto;
+    display: block;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    overflow-x: hidden; /* جلوگیری از اسکرول افقی */
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+/* استایل‌های placeholder برای textarea */
+.import-data-textarea::placeholder {
+    font-family: 'Vazirmatn', sans-serif;
+    color: #888;
+    opacity: 0.8;
+    font-size: 0.95rem;
+    text-align: center;
+    padding-top: 40px;
+}
+
+.export-data-textarea:focus, .import-data-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(62, 187, 85, 0.2);
+}
+
+/* Styles for landscape orientation on mobile devices */
+@media (max-width: 850px) and (orientation: landscape) {
+    .goal {
+        width: calc(50% - 15px);
+        margin: 8px 0;
+    }
+    
+    #goals {
+        gap: 15px;
+        justify-content: center;
+    }
+    
+    /* Improve form animation for landscape mode */
+    .add-goal-form {
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-height: 0;
+    }
+    
+    .add-goal-form.visible {
+        max-height: 300px;
+    }
+}
+
+/* Ensure single column layout for very small landscape screens */
+@media (max-width: 600px) and (orientation: landscape) {
+    .goal {
+        width: 100%;
+        margin: 8px 0;
+    }
+}
+
+/* Tablet and mobile styles for form */
+@media (max-width: 576px) {
+    .add-goal-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .add-goal-form input[type="text"], 
+    .add-goal-form input[type="number"], 
+    .add-goal-form input[type="url"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .add-goal-form button[type="submit"] {
+        width: 100%;
+        margin-top: 5px;
     }
 } 

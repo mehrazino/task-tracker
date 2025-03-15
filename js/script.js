@@ -321,6 +321,7 @@ function showSupportModal() {
             </div>
             <div class="modal-footer">
                 <button class="modal-button confirm-button">باشه حالا!</button>
+                <a href="https://t.me/mehrazeno" target="_blank" class="modal-button contact-button">ارتباط با من</a>
             </div>
         </div>
     `;
@@ -605,8 +606,8 @@ function createGoalElement(goal) {
                 <button class="del-button" onclick="deleteGoal(${goal.id}); event.stopPropagation();">حذف</button>
             </div>
             
-            <div id="input-container-${goal.id}" style="display: none;" class="input-group">
-                <div class="input-group">
+            <div class="button-group">
+                <div id="input-container-${goal.id}" style="display: none;" class="input-group">
                     <input type="number" id="new-target-${goal.id}" min="0" placeholder="تعداد جدید" required onclick="event.stopPropagation();">
                     <button type="button" onclick="editGoal(${goal.id}); event.stopPropagation();">به‌روزرسانی</button>
                 </div>
@@ -928,9 +929,10 @@ function toggleAddForm() {
         toggleButton.textContent = 'افزودن کار جدید';
         
         // Animate closing
+        form.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
         form.style.opacity = '0';
         form.style.maxHeight = '0';
-        form.style.transform = 'translateY(-20px)';
+        form.style.transform = 'translateY(-20px) scaleY(0.8)';
         
         setTimeout(() => {
             form.style.display = 'none';
@@ -940,10 +942,13 @@ function toggleAddForm() {
         form.style.display = 'flex';
         form.style.opacity = '0';
         form.style.maxHeight = '0';
-        form.style.transform = 'translateY(-20px)';
+        form.style.transform = 'translateY(-20px) scaleY(0.8)';
         
         // Force reflow
         void form.offsetWidth;
+        
+        // Set transition for smooth animation
+        form.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
         
         // Animate opening
         form.classList.add('visible');
@@ -951,8 +956,8 @@ function toggleAddForm() {
         toggleButton.textContent = 'بستن';
         
         form.style.opacity = '1';
-        form.style.maxHeight = '200px'; // Adjust based on your form's height
-        form.style.transform = 'translateY(0)';
+        form.style.maxHeight = '300px'; // Increased height to ensure all elements are visible
+        form.style.transform = 'translateY(0) scaleY(1)';
     }
 }
 
@@ -968,9 +973,10 @@ function closeAddForm() {
         toggleButton.textContent = 'افزودن کار جدید';
         
         // Animate closing
+        form.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
         form.style.opacity = '0';
         form.style.maxHeight = '0';
-        form.style.transform = 'translateY(-20px)';
+        form.style.transform = 'translateY(-20px) scaleY(0.8)';
         
         setTimeout(() => {
             form.style.display = 'none';
@@ -1036,30 +1042,29 @@ function toggleEditForm(event, goalId) {
     
     var inputContainer = document.getElementById('input-container-' + goalId);
     if (inputContainer.style.display === 'none' || inputContainer.style.display === '') {
-        // First set display to block but with height 0 and opacity 0
-        inputContainer.style.display = 'block';
-        inputContainer.style.maxHeight = '0';
+        // First set display to flex but with opacity 0
+        inputContainer.style.display = 'flex';
         inputContainer.style.opacity = '0';
-        inputContainer.style.overflow = 'hidden';
-        
-        // Ensure the container has proper spacing
-        inputContainer.style.marginTop = '15px';
-        inputContainer.style.paddingTop = '15px';
-        inputContainer.style.borderTop = '1px dashed var(--card-border)';
-        
-        // Set transitions for smooth animation
-        inputContainer.style.transition = 'opacity 0.6s ease, max-height 0.6s ease';
         
         // Force reflow
         void inputContainer.offsetWidth;
         
+        // Set transitions for smooth animation
+        inputContainer.style.transition = 'opacity 0.4s ease';
+        
         // Animate to visible state
         inputContainer.style.opacity = '1';
-        inputContainer.style.maxHeight = '100px'; // Adjust based on your form's height
+        
+        // Focus on the input field
+        setTimeout(() => {
+            const inputField = document.getElementById(`new-target-${goalId}`);
+            if (inputField) {
+                inputField.focus();
+            }
+        }, 100);
     } else {
         // Animate to hidden state
         inputContainer.style.opacity = '0';
-        inputContainer.style.maxHeight = '0';
         
         // Wait for animation to complete before hiding
         setTimeout(() => {
@@ -1081,41 +1086,53 @@ function addGoal() {
     // The number of tasks can be empty or a positive number
     const target = targetValue === '' ? null : parseInt(targetValue);
     
-    if (name && (target === null || (!isNaN(target) && target > 0))) {
-        // Create new goal
-        const newGoal = {
-            id: nextId++,
-            name: name,
-            target: target,
-            current: 0,
-            link: link || null,
-            createdAt: new Date().toISOString()
-        };
-        
-        // Add to goals array
-        goals.push(newGoal);
-        
-        // Save to localStorage
-        saveGoals();
-        
-        // Add the new goal to the DOM
-        const goalsContainer = document.getElementById('goals');
-        const goalElement = createGoalElement(newGoal);
-        goalsContainer.appendChild(goalElement);
-        
-        // Clear form
-        nameInput.value = '';
-        targetInput.value = '';
-        linkInput.value = '';
-        
-        // Close form
-        closeAddForm();
-        
-        // Show success notification
-        showNotification(`کار "${name}" با موفقیت اضافه شد!`, 'success');
-    } else {
-        showNotification('لطفاً نام کار را به درستی وارد کنید!', 'error');
+    // Custom validation - check if name is empty
+    if (!name) {
+        // Show custom error notification instead of browser's default message
+        showNotification("لطفاً نام برنامه را وارد کنید", "error");
+        nameInput.focus();
+        return;
     }
+    
+    // Validate target if provided
+    if (targetValue !== '' && (isNaN(target) || target <= 0)) {
+        showNotification("تعداد کار باید عدد مثبت باشد", "error");
+        targetInput.focus();
+        return;
+    }
+    
+    // If we reach here, validation passed
+    // Create new goal
+    const newGoal = {
+        id: nextId++,
+        name: name,
+        target: target,
+        current: 0,
+        link: link || null,
+        createdAt: new Date().toISOString()
+    };
+    
+    // Add to goals array
+    goals.push(newGoal);
+    
+    // Save to localStorage
+    saveGoals();
+    
+    // Add the new goal to the DOM
+    const goalsContainer = document.getElementById('goals');
+    const goalElement = createGoalElement(newGoal);
+    goalsContainer.appendChild(goalElement);
+    
+    // Clear form
+    nameInput.value = '';
+    targetInput.value = '';
+    linkInput.value = '';
+    
+    // Close form
+    closeAddForm();
+    
+    // Show success notification
+    showNotification(`کار "${name}" با موفقیت اضافه شد!`, 'success');
 }
 
 // Function to edit a goal
@@ -1267,7 +1284,7 @@ function cancelDelete(goalId) {
 function clearAllData() {
     showModal({
         title: 'پاک کردن داده‌ها',
-        message: 'مطمئنی می‌خوای همه داده‌هات رو پاک کنی؟<br>بعد از حذف دیگه برگشت نداره!',
+        message: 'مطمئنی می‌خوای همه داده‌هایت رو پاک کنی؟<br>بعد از حذف دیگه برگشت نداره!',
         confirmText: 'آره، پاک کن',
         cancelText: 'نه، بی‌خیال',
         type: 'warning'
@@ -1396,13 +1413,13 @@ function showImportDataModal() {
                         <textarea id="import-data-text" class="import-data-textarea" placeholder="اینجا"></textarea>
                     </div>
                     <div class="import-data-warning">
-                        <p>⚠️ توجه: این کار همه داده‌های فعلیت رو با داده‌های جدید جایگزین می‌کنه!</p>
+                        <p>⚠️ توجه: این کار همه داده‌های فعلی رو با داده‌های جدید جایگزین می‌کنه!</p>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="modal-button cancel-button">بی‌خیال</button>
-                <button class="modal-button confirm-button" id="import-data-confirm">ثبت </button>
+                <button class="modal-button confirm-button" id="import-data-confirm">ثبت</button>
             </div>
         </div>
     `;

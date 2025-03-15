@@ -15,11 +15,19 @@
     <!-- Add form container that will hold both form and button -->
     <div class="form-container">
         <!-- Place form before button so it appears above -->
-        <form id="add-goal-form" class="add-goal-form" style="display: none; overflow: hidden; max-height: 0;">
-            <input type="text" id="goal_name" placeholder="نام برنامه" required>
-            <input type="number" id="goal_target" placeholder="تعداد کار">
-            <input type="url" id="goal_link" placeholder="لینک (اختیاری)">
-            <button type="button" id="add-goal-submit">افزودن</button>
+        <form id="add-goal-form" class="add-goal-form" style="display: none; overflow: hidden; max-height: 0;" onsubmit="return false;" novalidate>
+            <div class="form-input-container">
+                <input type="text" id="goal_name" placeholder="نام برنامه" required>
+            </div>
+            <div class="form-input-container">
+                <input type="number" id="goal_target" placeholder="تعداد کار">
+            </div>
+            <div class="form-input-container">
+                <input type="url" id="goal_link" placeholder="لینک (اختیاری)">
+            </div>
+            <div class="form-button-container">
+                <button type="submit" id="add-goal-submit">افزودن</button>
+            </div>
         </form>
         
         <!-- Add toggle button for the form -->
