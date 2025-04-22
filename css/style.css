@@ -1344,6 +1344,7 @@ a:hover {
     margin-left: 10px;
     position: absolute;
     right: 20px;
+    cursor: pointer;
 }
 
 .modal-header h3 {

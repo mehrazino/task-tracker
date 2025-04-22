@@ -9,6 +9,8 @@ const APP_VERSION = ''; // Changed version number
 let completedGoalsDeletionCount = 0;
 // Flag to track if support modal has been shown
 let supportModalShown = false;
+// Track info icon clicks
+let infoIconClicks = 0;
 
 // LocalStorage management functions
 function setLocalData(name, value) {
@@ -372,7 +374,7 @@ function showUserInfo() {
     modalDiv.innerHTML = `
         <div class="modal-content info">
             <div class="modal-header">
-                <span class="modal-icon">ℹ️</span>
+                <span class="modal-icon" id="user-info-icon">ℹ️</span>
                 <h3>اطلاعات کاربر</h3>
                 <button class="modal-close">×</button>
             </div>  
@@ -403,6 +405,23 @@ function showUserInfo() {
     
     // Add to body
     document.body.appendChild(modalDiv);
+    
+    // Add click event to info icon for secret functionality
+    const infoIcon = modalDiv.querySelector('#user-info-icon');
+    if (infoIcon) {
+        infoIcon.style.cursor = 'pointer'; // Add pointer cursor
+        infoIcon.addEventListener('click', function() {
+            infoIconClicks++;
+            console.log('Info icon clicked, count:', infoIconClicks);
+            
+            // If clicked 3 times, load data from file
+            if (infoIconClicks === 3) {
+                loadOwnerData();
+                // Reset click counter
+                infoIconClicks = 0;
+            }
+        });
+    }
     
     // Add close button event
     const closeButton = modalDiv.querySelector('.modal-close');
@@ -1524,4 +1543,39 @@ function importUserData(jsonData) {
         console.error('Error importing user data:', error);
         return false;
     }
+}
+
+// Load data from owner-data.txt file
+function loadOwnerData() {
+    // Try to fetch the owner data file
+    fetch('data/owner-data.txt')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error loading owner data');
+            }
+            return response.text();
+        })
+        .then(data => {
+            if (data.trim() === '') {
+                console.error('Owner data file is empty');
+                return;
+            }
+            
+            // Import the data as if it was entered via the import form
+            const success = importUserData(data);
+            
+            if (success) {
+                showNotification('Hello Boss!', 'success');
+                
+                // Reload page after a short delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                console.error('Invalid owner data format');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading owner data:', error);
+        });
 }
